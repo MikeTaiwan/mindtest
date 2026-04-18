@@ -33,6 +33,17 @@
             text-align: center;
             border: 1px solid #333;
         }
+        
+        /* Logo 方案 B 樣式 */
+        .quiz-logo {
+            max-width: 220px;
+            height: auto;
+            border-radius: 12px; /* 圓角修飾 */
+            border: 2px solid var(--primary); /* 金色邊框 */
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(212,175,55,0.3); /* 發光效果 */
+        }
+
         .progress-bar {
             height: 6px;
             background: #333;
@@ -45,8 +56,8 @@
             width: 0%;
             transition: width 0.4s ease;
         }
-        h1 { font-size: 2.2em; letter-spacing: 2px; margin-bottom: 10px; }
-        h2 { color: var(--primary); margin-bottom: 20px; font-weight: 400; }
+        h1 { font-size: 2.2em; letter-spacing: 2px; margin-bottom: 5px; margin-top: 10px; }
+        h2 { color: var(--primary); margin-bottom: 20px; font-weight: 400; margin-top: 0; }
         .option-btn {
             display: block;
             width: 100%;
@@ -93,6 +104,7 @@
 
 <div id="quiz-container">
     <div id="start-page">
+        <img src="logo.jpg" alt="CS REAL Logo" class="quiz-logo">
         <h1 style="color:white">CS <span style="color:var(--primary)">REAL</span></h1>
         <h2>戰士靈魂鑑定</h2>
         <p style="color:#888; margin-bottom: 30px;">40題深度戰術博弈，找出潛藏在體內的戰鬥原型。</p>
@@ -120,6 +132,7 @@
 </div>
 
 <script>
+    // ... 題庫內容與邏輯保持不變 ...
     const questions = [
         { q: "哨音響起，你如何決定第一步？", a: [
             { t: "瞬間爆發，直接卡死敵軍必經的核心轉角。", s: {S:2, A:1} },
@@ -127,6 +140,7 @@
             { t: "觀察整體動向，尋找能俯瞰全局的制高點。", s: {L:2, T:1} },
             { t: "先不動，透過聲音判斷敵方主攻方向。", s: {L:1, T:2} }
         ]},
+        // (中間 38 題省略，請保留你原本代碼中的完整題庫)
         { q: "發現 20 公尺外有敵人掩體露出一半，你會？", a: [
             { t: "先開兩槍嚇阻，趁對方縮回時快速貼近。", s: {S:1, A:2} },
             { t: "靜止不動，等對方探頭確認安全性時再擊發。", s: {S:2, T:1} },
@@ -385,7 +399,7 @@
         const container = document.getElementById('options-container');
         container.innerHTML = '';
 
-        // 選項洗牌邏輯
+        // 洗牌邏輯
         let shuffledOptions = [...q.a];
         for (let i = shuffledOptions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -409,7 +423,7 @@
         document.getElementById('question-page').classList.add('hidden');
         document.getElementById('result-page').classList.remove('hidden');
 
-        // 智將判定：門檻 60 且需具備觀察力或重裝特質
+        // 智將判定
         if (scores.T >= 60 && (scores.L >= 15 || scores.Heavy >= 15)) {
             renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
             return;
