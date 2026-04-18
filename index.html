@@ -1,199 +1,117 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS Real 戰士靈魂鑑定 - 找出你的生存本能</title>
-    <style>
-        :root {
-            --primary: #d4af37; /* 戰術金 */
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --text: #e0e0e0;
-            --accent: #4caf50;
-        }
-        body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 15px;
-        }
-        #quiz-container {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            max-width: 650px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid #333;
-        }
-        .progress-bar {
-            height: 6px;
-            background: #333;
-            border-radius: 3px;
-            margin-bottom: 25px;
-        }
-        #progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8b7322, var(--primary));
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-        h1 { font-size: 2.2em; letter-spacing: 2px; margin-bottom: 10px; }
-        h2 { color: var(--primary); margin-bottom: 20px; font-weight: 400; }
-        .option-btn {
-            display: block;
-            width: 100%;
-            padding: 16px 20px;
-            margin: 12px 0;
-            background: #252525;
-            border: 1px solid #444;
-            color: #ccc;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            text-align: left;
-            line-height: 1.4;
-        }
-        .option-btn:hover {
-            background: #333;
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .hidden { display: none !important; }
-        #result-page { animation: fadeIn 0.8s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        #result-image { width: 280px; height: auto; margin: 25px 0; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
-        .main-btn {
-            background: var(--primary);
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            color: #000;
-            font-weight: bold;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(212,175,55,0.5); }
-        #result-desc { font-size: 17px; line-height: 1.7; text-align: justify; padding: 0 10px; color: #bbb; }
-    </style>
-</head>
-<body>
-
-<div id="quiz-container">
-    <div id="start-page">
-        <h1 style="color:white">CS <span style="color:var(--primary)">REAL</span></h1>
-        <h2>戰士靈魂鑑定</h2>
-        <p style="color:#888; margin-bottom: 30px;">40題深度戰術博弈，找出潛藏在體內的戰鬥原型。</p>
-        <button class="main-btn" onclick="startQuiz()">進入鑑定</button>
-    </div>
-
-    <div id="question-page" class="hidden">
-        <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div id="question-number" style="color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
-        <h3 id="question-text" style="font-size: 1.4em; margin-bottom: 25px;"></h3>
-        <div id="options-container"></div>
-    </div>
-
-    <div id="result-page" class="hidden">
-        <h3 style="color:#888; margin:0;">鑑定結果</h3>
-        <h1 id="result-title" style="color: var(--primary); margin-top: 10px;"></h1>
-        <img id="result-image" src="" alt="戰魂角色">
-        <p id="result-desc"></p>
-        <button class="main-btn" onclick="location.reload()">重新鑑定</button>
-        <div style="margin-top: 30px; font-size: 0.8em; color: #555;">
-            <p>截圖結果至 CS REAL 高雄店，領取專屬優惠！</p>
-            <p>© 2026 CS REAL Kaohsiung</p>
-        </div>
-    </div>
-</div>
-
-<script>
-    const questions = [
-        // 1-10: 距離與直覺 (S/L)
-        // ... (省略中間 40 題的格式結構，請參照前文完整代碼填入) ...
-    ];
-
-    let currentIdx = 0;
-    let scores = { S:0, L:0, A:0, T:0, Light:0, Heavy:0 };
-
-    function startQuiz() {
-        document.getElementById('start-page').classList.add('hidden');
-        document.getElementById('question-page').classList.remove('hidden');
-        showQuestion();
-    }
-
-    function showQuestion() {
-        if (currentIdx >= questions.length) {
-            showResult();
-            return;
-        }
-        const q = questions[currentIdx];
-        document.getElementById('question-number').innerText = `STEP ${currentIdx + 1} / ${questions.length}`;
-        document.getElementById('question-text').innerText = q.q;
-        document.getElementById('progress-fill').style.width = `${((currentIdx) / questions.length) * 100}%`;
-        
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-        q.a.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt.t;
-            btn.onclick = () => {
-                for (let key in opt.s) { scores[key] += opt.s[key]; }
-                currentIdx++;
-                showQuestion();
-            };
-            container.appendChild(btn);
-        });
-    }
-
-    function showResult() {
-        document.getElementById('question-page').classList.add('hidden');
-        document.getElementById('result-page').classList.remove('hidden');
-
-        // 頭目隱藏權重邏輯 (智將)
-        if (scores.T >= 35) {
-            renderResult("戰場掠奪者 /智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
-            return;
-        }
-
-        let d = scores.S >= scores.L ? "S" : "L";
-        let s = scores.A >= scores.T ? "A" : "T";
-        let l = scores.Light >= scores.Heavy ? "L" : "H";
-        let resKey = d + s + l;
-
-        const resultsMap = {
-            "SAL": ["雷霆尖兵", "sal.png", "你是戰場上的發動機！速度就是一切。你享受前線火拼的快感，是隊友眼中最可靠的箭頭。"],
-            "SAH": ["鋼鐵破門手", "sah.png", "你是隊伍中的坦克，暴力破開防線。你不怕痛、不退縮，負責吸收火力讓隊友輸出。"],
-            "STL": ["暗影刺客", "stl.png", "你是場上的幽靈。擅長利用死角與潛行，摸到背後給予致命一擊。"],
-            "STH": ["戰術執行官", "sth.png", "專業的化身。注重團隊推進與戰術配置，動作標準、切角冷靜。"],
-            "LAL": ["荒野游騎兵", "lal.png", "高機動長程獵人。體力極好，在大場地中跑動換位，讓對手永遠摸不透。"],
-            "LAH": ["重裝火力手", "lah.png", "移動彈藥庫。用源源不絕的子彈壓制敵方防線，讓他們連頭都不敢露。"],
-            "LTL": ["寂靜狙擊手", "ltl.png", "忍耐力的極致。偽裝並融入環境，透過高倍鏡，給予遠處目標一擊必殺。"],
-            "LTH": ["戰場防禦大師", "lth.png", "最後一道防線。冷靜的頭腦與精準判斷，只要你在的地方，防線就是穩固的。"]
-        };
-
-        const data = resultsMap[resKey] || resultsMap["STH"];
-        renderResult(data[0], data[1], data[2]);
-    }
-
-    function renderResult(title, img, desc) {
-        document.getElementById('result-title').innerText = title;
-        document.getElementById('result-image').src = img;
-        document.getElementById('result-desc').innerText = desc;
-    }
-</script>
-</body>
-</html>
+const questions = [
+        { q: "哨音響起，你如何決定第一步？", a: [
+            { t: "瞬間爆發，直接卡死敵軍必經的核心轉角。", s: {S:2, A:1} },
+            { t: "依照隊友位置補位，確保戰線無漏洞。", s: {S:1, T:1} },
+            { t: "觀察整體動向，尋找能俯瞰全局的制高點。", s: {L:2, T:1} },
+            { t: "先不動，透過聲音判斷敵方主攻方向。", s: {L:1, T:2} }
+        ]},
+        { q: "發現 20 公尺外有敵人掩體露出一半，你會？", a: [
+            { t: "先開兩槍嚇阻，趁對方縮回時快速貼近。", s: {S:1, A:2} },
+            { t: "靜止不動，等對方探頭確認安全性時再擊發。", s: {S:2, T:1} },
+            { t: "利用倍鏡鎖定其邊緣，逼迫對方完全不敢動。", s: {L:2, T:1} },
+            { t: "故意朝反方向開火引誘他看錯方向，交給隊友收割。", s: {T:2, L:1} }
+        ]},
+        { q: "你最不喜歡哪種戰鬥環境？", a: [
+            { t: "空曠大平原：沒辦法展現近身壓制力。", s: {S:2} },
+            { t: "單向窄巷：沒辦法拉開距離發揮視野優勢。", s: {L:2} },
+            { t: "低難度場地：障礙物太少，沒辦法玩心理博弈。", s: {T:2} },
+            { t: "復活點太遠：衝鋒斷了節奏很掃興。", s: {A:2} }
+        ]},
+        { q: "你的副武器（手槍）對你而言是？", a: [
+            { t: "靈魂！極限反殺的利器，近戰比主槍靈活。", s: {S:2, Light:1} },
+            { t: "專業保險，主槍故障時的無縫接軌。", s: {T:1, Heavy:1} },
+            { t: "增加負重感與擬真度的必要裝備。", s: {Heavy:2} },
+            { t: "戰術工具，掛載專門用於特定任務。", s: {S:1, T:1} }
+        ]},
+        { q: "面對「CQB 清房間」，你的首選節奏？", a: [
+            { t: "暴力破門，利用速度與視覺震撼瞬間清空。", s: {S:2, A:2} },
+            { t: "標準切角推進，一吋一吋地蠶食空間。", s: {S:1, T:2} },
+            { t: "先製造假聲引誘對方開火，抓間隙反擊。", s: {T:2, S:1} },
+            { t: "在門外保持靜默，等室內的人耐不住跑出來。", s: {L:1, T:1} }
+        ]},
+        { q: "當你被敵火壓制在掩體後，你的直覺？", a: [
+            { t: "盲射回擊，並趁機翻滾到下一個攻擊位置。", s: {S:2, A:1} },
+            { t: "冷靜分析對方彈道規律，尋找換彈間隙。", s: {T:2, L:1} },
+            { t: "縮小受彈面，透過無線電指引遠處隊友包抄。", s: {L:1, T:2} },
+            { t: "拚著中彈風險強行反擊，不讓對方壓過來。", s: {A:2, Heavy:1} }
+        ]},
+        { q: "你覺得最能體現「實力」的擊殺距離是？", a: [
+            { t: "貼身肉搏（甚至刀殺），心臟跳動的距離。", s: {S:2, A:1} },
+            { t: "10公尺，專業 CQB 的標準交戰點。", s: {S:1, T:1} },
+            { t: "30公尺，展現槍枝調教與穩定度。", s: {L:1, T:1} },
+            { t: "視線邊緣，在對方反應之外精準擊落。", s: {L:2, T:1} }
+        ]},
+        { q: "在低光（昏暗）場地，你如何運作？", a: [
+            { t: "快速跑動，利用明暗交替產生的視覺盲區。", s: {A:2, S:1} },
+            { t: "定點靜默，成為環境的一部分。", s: {T:2, L:1} },
+            { t: "利用強光燈頻繁『點閃』，打亂對方適應。", s: {S:1, Heavy:1} },
+            { t: "躲在光源後方，誘使對方向亮處開火。", s: {T:2, L:1} }
+        ]},
+        { q: "你最常採用的射擊姿勢？", a: [
+            { t: "隨時準備移動的高姿態射擊。", s: {A:1, Light:2} },
+            { t: "緊貼掩體的極限切角姿態。", s: {T:2, S:1} },
+            { t: "趴在地上追求極致精準的穩重姿勢。", s: {L:2, Heavy:1} },
+            { t: "隨性但自信的反射式快射。", s: {A:2} }
+        ]},
+        { q: "關於『陣亡 (HIT)』，你對自己的期望是？", a: [
+            { t: "寧可衝鋒死，不可龜縮生。", s: {A:2} },
+            { t: "每一場都要帶走比我多三倍的人數。", s: {S:1, T:1} },
+            { t: "零陣亡，存活到最後一刻並完成任務。", s: {T:2, L:1} },
+            { t: "只要能打開局面，我當誘餌而死也甘願。", s: {T:2, S:1} }
+        ]},
+        { q: "你對槍枝的外型偏好？", a: [
+            { t: "越短越好（如 MP7），行動不受限。", s: {S:2, Light:1} },
+            { t: "全裝備重裝感，裝滿各種擬真配件。", s: {Heavy:2} },
+            { t: "高科技感，各種光學儀器一應俱全。", s: {T:1, Heavy:1} },
+            { t: "老練簡潔，只裝真正用得到的配件。", s: {L:1, T:1} }
+        ]},
+        { q: "當你發現主武器彈藥耗盡，但敵蹤就在附近？", a: [
+            { t: "直接拔出手槍，利用速度強行突入。", s: {S:2, A:1} },
+            { t: "退回掩體，進行最快速度的換彈。", s: {T:2, Heavy:1} },
+            { t: "故意現身當誘餌（兔子），引敵進入伏擊區。", s: {T:2, S:1} },
+            { t: "大喊槍故障騙對方探頭再趁機撤退。", s: {T:2} }
+        ]},
+        { q: "你對戰術背心 (Plate Carrier) 的要求？", a: [
+            { t: "越輕越好，能插三個彈匣就夠了。", s: {Light:2, A:1} },
+            { t: "負重就是訓練，塞滿抗彈板與備份彈藥。", s: {Heavy:2, S:1} },
+            { t: "配置必須科學，每個包位都有用途。", s: {T:2, Heavy:1} },
+            { t: "帥是一輩子的事，配色必須完美。", s: {Heavy:1} }
+        ]},
+        { q: "在長程任務中，你會？", a: [
+            { t: "只帶槍跟子彈，體力就是本錢。", s: {Light:2, A:1} },
+            { t: "攜帶完整生存包、水袋、通訊設備。", s: {Heavy:2, T:1} },
+            { t: "找個要道建立防禦點，省下無謂跑動。", s: {L:1, T:1} },
+            { t: "不斷換位，確保永遠處於戰場側面。", s: {T:2, S:1} }
+        ]},
+        { q: "選擇頭部護具時，你的考量？", a: [
+            { t: "散熱第一，甚至只帶護目鏡。", s: {Light:2, S:1} },
+            { t: "全防護頭盔掛載夜視鏡架，專業感滿分。", s: {Heavy:2, T:1} },
+            { t: "包覆性最強的面罩，不怕被打痛。", s: {Heavy:2, S:1} },
+            { t: "經典造型（棒球帽），展現老兵風範。", s: {Light:1} }
+        ]},
+        { q: "關於手榴彈，你的理解是？", a: [
+            { t: "暴力清房的敲門磚。", s: {A:2, Heavy:1} },
+            { t: "撤退時丟在身後阻斷敵軍。", s: {T:2, Light:1} },
+            { t: "製造聲響誘敵的戰術工具。", s: {T:2, S:1} },
+            { t: "嫌重嫌麻煩，很少使用。", s: {Light:1} }
+        ]},
+        { q: "你對『負重』的看法？", a: [
+            { t: "負重會殺死靈活性，極簡才是王道。", s: {Light:2, A:1} },
+            { t: "裝備越多，生存能力就越強。", s: {Heavy:2, S:1} },
+            { t: "負重必須平衡，重量均勻分布。", s: {T:2, Heavy:1} },
+            { t: "為了帥氣，重一點可以忍受。", s: {Heavy:1} }
+        ]},
+        { q: "你的槍枝動力選擇通常基於？", a: [
+            { t: "射速與壓制力（如 HPA/電槍）。", s: {A:2, Heavy:1} },
+            { t: "擬真操縱感（如 GBB）。", s: {T:1, S:1} },
+            { t: "極致的靜音與隱蔽（如手拉）。", s: {L:2, T:1} },
+            { t: "穩定性與保養便利性。", s: {T:1} }
+        ]},
+        { q: "你的射擊風格偏向？", a: [
+            { t: "火力覆蓋，讓敵人不敢露頭。", s: {A:2, Heavy:1} },
+            { t: "雙連發點射，平衡精度與威力。", s: {T:2, S:1} },
+            { t: "慢速點射，每一發都要有意義。", s: {L:2, T:1} },
+            { t: "指向射擊，靠肌肉記憶反射。", s: {S:2, A:1} }
+        ]},
+        { q: "當你全副武裝，你的心態是？", a: [
+            { t: "今天又是瘋狂運動的一天！",
