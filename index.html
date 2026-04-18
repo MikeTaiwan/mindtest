@@ -384,7 +384,15 @@
         
         const container = document.getElementById('options-container');
         container.innerHTML = '';
-        q.a.forEach(opt => {
+
+        // 選項洗牌邏輯
+        let shuffledOptions = [...q.a];
+        for (let i = shuffledOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+        }
+
+        shuffledOptions.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt.t;
@@ -401,12 +409,11 @@
         document.getElementById('question-page').classList.add('hidden');
         document.getElementById('result-page').classList.remove('hidden');
 
-        // 頭目隱藏權重邏輯 (智將) 
-        // 門檻提高到 60，且必須具備一定的觀察力 (L) 或 裝備深度 (Heavy)
-          if (scores.T >= 60 && (scores.L >= 15 || scores.Heavy >= 15)) {
-          renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
-          return;
-             }
+        // 智將判定：門檻 60 且需具備觀察力或重裝特質
+        if (scores.T >= 60 && (scores.L >= 15 || scores.Heavy >= 15)) {
+            renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
+            return;
+        }
 
         let d = scores.S >= scores.L ? "S" : "L";
         let s = scores.A >= scores.T ? "A" : "T";
