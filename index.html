@@ -401,11 +401,12 @@
         document.getElementById('question-page').classList.add('hidden');
         document.getElementById('result-page').classList.remove('hidden');
 
-        // 頭目隱藏權重邏輯 (智將) - T 分數超過 35 分觸發
-        if (scores.T >= 35) {
-            renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
-            return;
-        }
+        // 頭目隱藏權重邏輯 (智將) 
+        // 門檻提高到 60，且必須具備一定的觀察力 (L) 或 裝備深度 (Heavy)
+          if (scores.T >= 60 && (scores.L >= 15 || scores.Heavy >= 15)) {
+          renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌（兔子戰術）與心理壓制來控制戰場節奏。實力得到 CS REAL 頭目的認證！");
+          return;
+             }
 
         let d = scores.S >= scores.L ? "S" : "L";
         let s = scores.A >= scores.T ? "A" : "T";
