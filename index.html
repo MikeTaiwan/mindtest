@@ -6,7 +6,7 @@
     <title>CS Real 戰士靈魂鑑定</title>
     <style>
         :root {
-            --primary: #d4af37; /* 戰術金 */
+            --primary: #d4af37;
             --bg: #121212;
             --card-bg: #1e1e1e;
             --text: #e0e0e0;
@@ -31,6 +31,14 @@
             width: 100%;
             text-align: center;
             border: 1px solid #333;
+        }
+        .site-logo {
+            display: block;
+            width: 300px;
+            max-width: 90%;
+            height: auto;
+            margin: 0 auto 22px auto;
+            border-radius: 10px;
         }
         .progress-bar {
             height: 6px;
@@ -80,20 +88,37 @@
             cursor: pointer;
             margin-top: 20px;
         }
-        #result-desc { font-size: 17px; line-height: 1.7; text-align: justify; color: #bbb; padding: 0 10px; }
+        #result-desc { font-size: 16px; line-height: 1.85; text-align: justify; color: #bbb; padding: 0 10px; }
+        .result-section {
+            margin: 10px 0;
+            padding: 12px 16px;
+            background: #252525;
+            border-left: 3px solid var(--primary);
+            border-radius: 6px;
+            text-align: left;
+        }
+        .result-section-title {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
 <div id="quiz-container">
     <div id="start-page">
-        <h1 style="color:white; margin-top: 20px;">CS <span style="color:var(--primary)">REAL</span></h1>
+        <img src="Logo_banner.png" alt="CS Real 城市戰場" class="site-logo">
+        <h1 style="color:white; margin-top: 10px;">CS <span style="color:var(--primary)">REAL</span></h1>
         <h2>戰士靈魂鑑定</h2>
         <p style="color:#888; margin-bottom: 30px;">40題深度戰術博弈，找出潛藏在體內的戰鬥原型。</p>
         <button class="main-btn" onclick="startQuiz()">進入鑑定</button>
     </div>
 
     <div id="question-page" class="hidden">
+        <img src="Logo_banner.png" alt="CS Real" class="site-logo">
         <div class="progress-bar"><div id="progress-fill"></div></div>
         <div id="question-number" style="color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
         <h3 id="question-text" style="font-size: 1.4em; margin-bottom: 25px;"></h3>
@@ -101,10 +126,11 @@
     </div>
 
     <div id="result-page" class="hidden">
+        <img src="Logo_banner.png" alt="CS Real" class="site-logo">
         <h3 style="color:#888; margin:0;">鑑定結果</h3>
         <h1 id="result-title" style="color: var(--primary); margin-top: 10px;"></h1>
         <img id="result-image" src="" alt="戰魂角色">
-        <p id="result-desc"></p>
+        <div id="result-desc"></div>
         <button class="main-btn" onclick="location.reload()">重新鑑定</button>
         <div style="margin-top: 30px; font-size: 0.8em; color: #444;">
             <p>© 2026 CS REAL Kaohsiung</p>
@@ -374,7 +400,7 @@
         document.getElementById('question-number').innerText = `STEP ${currentIdx + 1} / ${questions.length}`;
         document.getElementById('question-text').innerText = q.q;
         document.getElementById('progress-fill').style.width = `${((currentIdx) / questions.length) * 100}%`;
-        
+
         const container = document.getElementById('options-container');
         container.innerHTML = '';
 
@@ -397,12 +423,26 @@
         });
     }
 
+    function buildResultHTML(sections) {
+        return sections.map(sec => `
+            <div class="result-section">
+                <div class="result-section-title">${sec.title}</div>
+                <div>${sec.content}</div>
+            </div>
+        `).join('');
+    }
+
     function showResult() {
         document.getElementById('question-page').classList.add('hidden');
         document.getElementById('result-page').classList.remove('hidden');
 
         if (scores.T >= 60 && (scores.L >= 15 || scores.Heavy >= 15)) {
-            renderResult("戰場掠奪者 / 智將", "predator.png", "恭喜！你的戰術思維已達宗師級。對你來說，彈藥、射程都不是限制，你最強大的武器是「敵人的恐懼」。你擅長利用假動作、誘餌與心理壓制來控制戰場節奏。實力得到官方認證！");
+            renderResult("戰場掠奪者 / 智將", "predator.png", [
+                { title: "⚔️ 核心特質", content: "你是少數能將直覺與謀略完美融合的罕見戰士。冷靜的頭腦藏在侵略性的外表之下，戰場上沒有任何情況能讓你失去判斷力。你習慣在交火前就已預設三步棋，讓對手永遠慢你半拍。" },
+                { title: "🎯 戰場表現", content: "你既能主動出擊又能穩守陣地，視情況自由切換。你會故意暴露破綻引誘對方進攻，再於反擊中精準收割。隊友常常搞不清楚你的下一步，但結果往往讓人折服。你擅長在混亂中找到秩序，在僵局中製造轉機。" },
+                { title: "🏅 最適角色", content: "全隊核心指揮官或獨立作戰特種兵。你可以一個人打開局面，也可以帶領整隊贏得勝利。" },
+                { title: "💬 給你的話", content: "「真正的掠奪者，從不讓獵物知道自己已被盯上。繼續讓對手摸不透你，那就是你最強的武器。」" }
+            ]);
             return;
         }
 
@@ -412,24 +452,101 @@
         let resKey = d + s + l;
 
         const resultsMap = {
-            "SAL": ["雷霆尖兵", "sal.png", "你是戰場上的發動機！速度就是一切。你享受前線火拼的快感，是隊友眼中最可靠的箭頭。"],
-            "SAH": ["鋼鐵破門手", "sah.png", "你是隊伍中的坦克，暴力破開防線。你不怕痛、不退縮，負責吸收火力讓隊友輸出。"],
-            "STL": ["暗影刺客", "stl.png", "你是場上的幽靈。擅長利用死角與潛行，摸到背後給予致命一擊。"],
-            "STH": ["戰術執行官", "sth.png", "專業的化身。注重團隊推進與戰術配置，動作標準、切角冷靜。"],
-            "LAL": ["荒野游騎兵", "lal.png", "高機動長程獵人。體力極好，在大場地中跑動換位，讓對手永遠摸不透。"],
-            "LAH": ["重裝火力手", "lah.png", "移動彈藥庫。用源源不絕的子彈壓制敵方防線，讓他們連頭都不敢露。"],
-            "LTL": ["寂靜狙擊手", "ltl.png", "忍耐力的極致。偽裝並融入環境，透過高倍鏡，給予遠處目標一擊必殺。"],
-            "LTH": ["戰場防禦大師", "lth.png", "最後一道防線。冷靜的頭腦與精準判斷，只要你在的地方，防線就是穩固的。"]
+            "SAL": {
+                title: "雷霆尖兵",
+                img: "sal.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是戰場上的發動機，天生為衝鋒而生。速度與爆發力是你最強的武器，任何猶豫都不在你的字典裡。你用行動告訴對手：進攻才是最好的防守，而你永遠是進攻的箭頭。" },
+                    { title: "🎯 戰場表現", content: "哨音一響，你就已經在最前線了。你擅長利用對方的反應時差強行突破，以超乎預期的速度卡位核心制高點。輕裝讓你行動不受限，你可以在敵人眨眼的瞬間完成包夾、突入或滲透。你的存在本身就是一種壓力。" },
+                    { title: "🏅 最適角色", content: "前鋒突擊手、旗標搶奪者。你適合擔任每一場任務的第一把刀，替隊友撕開敵方防線。" },
+                    { title: "💬 給你的話", content: "「子彈追不上你的步伐，膽怯的人看不懂你的戰術。帶著你的速度繼續往前衝，勝利永遠屬於第一個到達的人。」" }
+                ]
+            },
+            "SAH": {
+                title: "鋼鐵破門手",
+                img: "sah.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是整支隊伍的衝城錘，用身體替隊友開路。你不怕痛、不退縮，在敵火最密集的地方你偏偏要往前走。厚重的裝備是你的盔甲，也是你給敵人的心理壓力。" },
+                    { title: "🎯 戰場表現", content: "你擅長暴力破門與正面壓制，利用重裝的防護優勢硬吃對方的火力。你的存在讓隊友可以安心跟進，因為有你在前面，敵人不得不把注意力集中在你身上。你是盾也是矛，攻守一體。" },
+                    { title: "🏅 最適角色", content: "突擊隊破門手、前線護盾。最適合CQB近距離戰鬥，特別在清房任務中如魚得水。" },
+                    { title: "💬 給你的話", content: "「鋼鐵不會感到恐懼，只會向前推進。你是隊伍的鐵拳，每一次破門都是隊友勝利的開始。」" }
+                ]
+            },
+            "STL": {
+                title: "暗影刺客",
+                img: "stl.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是場上最危險的幽靈。你不相信正面交火，你相信的是讓對手永遠不知道死從何處來。耐心、冷靜、精準，是你在戰場上的三個守則，也是你讓敵人聞風喪膽的原因。" },
+                    { title: "🎯 戰場表現", content: "你擅長在敵方的盲區中移動，利用場地結構找到那些別人不敢去的死角。你的擊殺往往是無聲的，對手甚至來不及反應就已離場。你對場地的掌握程度遠超一般人，每次換位都經過計算。" },
+                    { title: "🏅 最適角色", content: "側翼滲透手、近距離伏擊者。在窄巷、暗區、CQB環境中你就是惡夢。" },
+                    { title: "💬 給你的話", content: "「真正的刺客不需要被人看見，只需要被人記住。保持沉默，讓戰果替你說話。」" }
+                ]
+            },
+            "STH": {
+                title: "戰術執行官",
+                img: "sth.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是隊伍裡最可靠的那塊拼圖。不衝動、不冒進，每一個動作都有其意義。你把專業精神帶入每一場遊戲，用標準化的戰術動作證明，紀律本身就是一種戰力。" },
+                    { title: "🎯 戰場表現", content: "你的切角動作乾淨俐落，掩護與推進的節奏拿捏精準。你會主動確認隊友位置再行動，不製造友軍的麻煩。你的存在讓整個小隊推進更有秩序，混亂的戰場在你眼中只是待解決的問題。" },
+                    { title: "🏅 最適角色", content: "小隊副指揮、CQB清房核心。在有戰術目標的任務型遊戲中，你是隊伍的骨幹。" },
+                    { title: "💬 給你的話", content: "「專業不是天賦，是一次次標準動作堆砌出來的習慣。繼續用你的執行力告訴大家，什麼叫做真正的戰士。」" }
+                ]
+            },
+            "LAL": {
+                title: "荒野游騎兵",
+                img: "lal.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是戰場上的變數，永遠在對手預期之外出現。體力是你最大的資本，高機動性讓你可以在大場地中自由游走。你不屬於任何一條防線，你屬於整個戰場。" },
+                    { title: "🎯 戰場表現", content: "你喜歡從側翼切入，在敵人建立陣型之前就打亂他們的計畫。你的移動路線讓對手難以預測，常常讓整個敵方陣型因為你的出現而崩潰。遠距離的精準加上不斷換位的靈活，讓你成為難以針對的威脅。" },
+                    { title: "🏅 最適角色", content: "外線游擊手、長程機動壓制。最適合開放型大場地，讓你的腿與槍法同時發揮。" },
+                    { title: "💬 給你的話", content: "「草原上最危險的獵手，從不在同一個地方出現兩次。繼續讓對手追著你的影子跑。」" }
+                ]
+            },
+            "LAH": {
+                title: "重裝火力手",
+                img: "lah.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是行動中的彈藥庫，也是敵方最不想在視野裡看到的目標。你用源源不絕的火力讓敵人連頭都不敢露，替隊友創造推進的機會。你的存在等於宣告：這條防線，任何人都不準通過。" },
+                    { title: "🎯 戰場表現", content: "你擅長建立壓制陣地，透過持續的彈幕控制敵方的行動自由。你不追求華麗的個人擊殺，你追求的是讓整個敵方陣線因為你的存在而無法運作。搭配隊友的側翼，你的壓制往往是勝利的關鍵鑰匙。" },
+                    { title: "🏅 最適角色", content: "火力壓制手、陣地防守核心。你最適合固定陣地戰，或需要在關鍵位置建立持續火力的任務。" },
+                    { title: "💬 給你的話", content: "「不是每顆子彈都要打中人，但每顆子彈都要讓對手知道——這裡，是我說了算。」" }
+                ]
+            },
+            "LTL": {
+                title: "寂靜狙擊手",
+                img: "ltl.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是忍耐力的極致體現。你可以在同一個位置靜待數十分鐘，只為等待那唯一一個完美的開槍時機。你不急躁，不衝動，因為你知道：時間，是最好的武器。" },
+                    { title: "🎯 戰場表現", content: "你擅長偽裝與環境融合，讓對手即使看向你的方向也找不到你的存在。你透過高倍鏡掌握整個戰場的動態，適時提供情報、壓制關鍵目標。一旦你開槍，往往意味著對方毫無還手之力。" },
+                    { title: "🏅 最適角色", content: "狙擊手、遠程情報員。你適合在高點或側翼建立永久性壓制，讓隊友在安全的推進環境中作戰。" },
+                    { title: "💬 給你的話", content: "「最好的狙擊手，是對手永遠不知道在哪裡的那一個。保持你的寂靜，讓準心替你咆哮。」" }
+                ]
+            },
+            "LTH": {
+                title: "戰場防禦大師",
+                img: "lth.png",
+                sections: [
+                    { title: "⚔️ 核心特質", content: "你是整個陣地最後也最堅固的防線。冷靜的判斷力與對戰場節奏的深刻理解，讓你能在最混亂的情況下做出最正確的決策。你不追求個人英雄主義，你追求的是整個任務的成功。" },
+                    { title: "🎯 戰場表現", content: "你擅長分析敵方進攻路線並提前部署反制。你清楚每一個角落的視野死角，也知道如何用最少的人手守住最關鍵的陣地。隊友知道只要你在防線上，就不需要回頭擔心後方的安全。" },
+                    { title: "🏅 最適角色", content: "防禦指揮官、後衛核心。在守點類任務或需要固守陣地的場景中，你是不可或缺的靈魂人物。" },
+                    { title: "💬 給你的話", content: "「最偉大的勝利，不是打倒多少敵人，而是讓敵人永遠突破不了你的防線。你就是那道不倒的牆。」" }
+                ]
+            }
         };
 
         const data = resultsMap[resKey] || resultsMap["STH"];
-        renderResult(data[0], data[1], data[2]);
+        renderResult(data.title, data.img, data.sections);
     }
 
-    function renderResult(title, img, desc) {
+    function renderResult(title, img, sections) {
         document.getElementById('result-title').innerText = title;
         document.getElementById('result-image').src = img;
-        document.getElementById('result-desc').innerText = desc;
+        const descEl = document.getElementById('result-desc');
+        if (Array.isArray(sections)) {
+            descEl.innerHTML = buildResultHTML(sections);
+        } else {
+            descEl.innerText = sections;
+        }
     }
 </script>
 </body>
